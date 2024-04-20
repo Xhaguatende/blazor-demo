@@ -1,0 +1,124 @@
+﻿@page "/newproduct"
+@page "/editproduct/{id:guid}"
+
+@inject NavigationManager NavigationManager
+@inject ProductsClient ProductsClient
+@inject CategoriesClient CategoriesClient
+
+@rendermode InteractiveServer
+
+<PageTitle>@_title</PageTitle>
+
+<h3>@_title</h3>
+
+@if (_categories == null || Product == null)
+{
+    <p><em>Loading...</em></p>
+
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm Model="@Product" FormName="editProduct" OnValidSubmit="HandleValidAsync">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" class="form-control" @bind-Value="Product.Name"/>
+                    <ValidationMessage For="() => Product.Name" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category:</label>
+                    <InputSelect id="category" class="form-select" @bind-Value="Product.CategoryId">
+                        <option value="">Select a category...</option>
+                        @foreach (var category in _categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Product.CategoryId" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputTextArea id="description" class="form-control" @bind-Value="Product.Description"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price:</label>
+                    <InputNumber id="price" class="form-control" @bind-Value="Product.Price"/>
+                    <ValidationMessage For="() => Product.Price" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="stock" class="form-label">Stock:</label>
+                    <InputNumber id="stock" class="form-control" @bind-Value="Product.Stock"/>
+                    <ValidationMessage For="() => Product.Stock" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a class="btn btn-secondary" role="button" href="/">Cancel</a>
+
+            </EditForm>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Product? Product { get; set; }
+
+    private List<Category>? _categories;
+
+    private string _title = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Product is not null)
+        {
+            return;
+        }
+
+        if (Id.HasValue)
+        {
+            Product = await ProductsClient.GetProductAsync(Id.Value);
+            _title = $"Edit Product {Product.Name}";
+        }
+        else
+        {
+            Product = new()
+            {
+                Name = string.Empty,
+            };
+            _title = "New Product";
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+         _categories = await CategoriesClient.GetCategoriesAsync();
+    }
+
+    private async Task HandleValidAsync()
+    {
+        ArgumentNullException.ThrowIfNull(Product);
+
+        if(Id is null || Id == Guid.Empty)
+        {
+            await ProductsClient.AddProductAsync(Product);
+        }
+        else
+        {
+            Product.Id = Id.Value;
+            await ProductsClient.UpdateProductAsync(Product);
+        }
+
+        NavigationManager.NavigateTo("/");
+    }
+}
