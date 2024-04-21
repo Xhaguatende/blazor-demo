@@ -26,6 +26,6 @@ public class Product
     [Range(0.01, 100)]
     public decimal Price { get; set; }
 
-    [Range(0, 1000)]
+    [Range(1, 1000)]
     public int Stock { get; set; }
 }
