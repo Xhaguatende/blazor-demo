@@ -4,14 +4,19 @@
 //  </copyright>
 // -------------------------------------------------------------------------------------
 
-namespace BlazorDemo.Services.Interfaces;
+namespace BlazorDemo.WebApp.Services.Interfaces;
 
-using Dto;
-using Models;
+using Models.Accounts;
 
 public interface IAccountServices
 {
-    Task<SignInResponse> SignInAsync(
-        SignInRequest signInRequest,
+    Task<RegisterResponse> RegisterAsync(
+        RegisterRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<SignInResponse> SignInAsync(
+        SignInRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task SignOutAsync(CancellationToken cancellationToken = default);
 }

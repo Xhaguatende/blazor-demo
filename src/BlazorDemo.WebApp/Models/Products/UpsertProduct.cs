@@ -1,14 +1,14 @@
 ﻿// -------------------------------------------------------------------------------------
-//  <copyright file="Product.cs" company="{Company Name}">
+//  <copyright file="UpsertProduct.cs" company="{Company Name}">
 //    Copyright (c) {Company Name}. All rights reserved.
 //  </copyright>
 // -------------------------------------------------------------------------------------
 
-namespace BlazorDemo.Models;
+namespace BlazorDemo.WebApp.Models.Products;
 
 using System.ComponentModel.DataAnnotations;
 
-public class Product
+public class UpsertProduct
 {
     [Required(ErrorMessage = "The category is required.")]
     public Guid CategoryId { get; set; } = default!;

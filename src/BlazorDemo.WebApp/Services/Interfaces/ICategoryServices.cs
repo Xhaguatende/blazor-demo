@@ -4,13 +4,13 @@
 //  </copyright>
 // -------------------------------------------------------------------------------------
 
-namespace BlazorDemo.Services.Interfaces;
+namespace BlazorDemo.WebApp.Services.Interfaces;
 
-using Models;
+using Models.Products;
 
 public interface ICategoryServices
 {
-    Task<List<Category>> GetCategoriesAsync(CancellationToken cancellationToken = default);
+    Task<List<Category>> GetAllAsync(CancellationToken cancellationToken = default);
 
-    Task<Category> GetCategoryByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Category> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }

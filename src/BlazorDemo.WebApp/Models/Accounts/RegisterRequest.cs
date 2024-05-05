@@ -1,15 +1,20 @@
 ﻿// -------------------------------------------------------------------------------------
-//  <copyright file="SignInRequest.cs" company="{Company Name}">
+//  <copyright file="RegisterRequest.cs" company="{Company Name}">
 //    Copyright (c) {Company Name}. All rights reserved.
 //  </copyright>
 // -------------------------------------------------------------------------------------
 
-namespace BlazorDemo.Models;
+namespace BlazorDemo.WebApp.Models.Accounts;
 
 using System.ComponentModel.DataAnnotations;
 
-public class SignInRequest
+public class RegisterRequest
 {
+    [Required]
+    [Compare(nameof(Password))]
+    [DataType(DataType.Password)]
+    public string ConfirmPassword { get; set; } = string.Empty;
+
     [Required]
     [EmailAddress]
     public string Email { get; set; } = string.Empty;

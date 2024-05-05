@@ -1,21 +1,32 @@
-using BlazorDemo.Services.Implementations;
-using BlazorDemo.Services.Interfaces;
-using BlazorDemo.WebApp.Clients;
 using BlazorDemo.WebApp.Components;
 using BlazorDemo.WebApp.Extensions;
+using BlazorDemo.WebApp.Providers;
+using BlazorDemo.WebApp.Services.Implementations;
+using BlazorDemo.WebApp.Services.Interfaces;
 using BlazorDemo.WebApp.Settings;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
-services.AddRazorPages();
 services.AddRazorComponents().AddInteractiveServerComponents();
+services.AddCascadingAuthenticationState();
+
+services.AddAuthentication(
+    options =>
+    {
+        options.DefaultAuthenticateScheme = AppConstants.AuthenticationType;
+        options.DefaultChallengeScheme = AppConstants.AuthenticationType;
+    });
+
+services.AddAuthorizationCore();
+
+services.AddScoped<AuthenticationStateProvider, BlazorDemoAuthenticationStateProvider>();
 
 services.AddHttpContextAccessor();
 
-builder.Services.AddOptions<ApiSettings>()
+services.AddOptions<ApiSettings>()
     .Bind(builder.Configuration.GetSection(nameof(ApiSettings)));
 
 var apiSettingsOptions = services.GetRequiredService<IOptions<ApiSettings>>();
@@ -40,24 +51,6 @@ services.AddHttpClient<ICategoryServices, CategoryServices>(
         client.BaseAddress = new Uri($"{apiSettings.BaseUrl}{apiSettings.CategoriesRoute}");
     });
 
-services.AddSingleton<ProductsClient>();
-services.AddSingleton<CategoriesClient>();
-
-services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(option =>
-    {
-        option.Cookie.SecurePolicy = CookieSecurePolicy.None;// env.IsDevelopment() ? CookieSecurePolicy.None : CookieSecurePolicy.Always;
-        option.Cookie.Name = "Test";
-        option.Cookie.HttpOnly = true;
-        option.Cookie.SameSite = SameSiteMode.Lax;
-        option.LoginPath = "/sign-in";
-        option.LogoutPath = "/sing-out";
-        option.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-        option.SlidingExpiration = true;
-    });
-
- 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -77,7 +70,6 @@ app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRazorPages();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 app.Run();

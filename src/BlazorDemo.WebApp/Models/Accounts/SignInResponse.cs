@@ -4,7 +4,7 @@
 //  </copyright>
 // -------------------------------------------------------------------------------------
 
-namespace BlazorDemo.Services.Dto;
+namespace BlazorDemo.WebApp.Models.Accounts;
 
 using System.Text.Json.Serialization;
 
@@ -21,5 +21,5 @@ public class SignInResponse
     [JsonPropertyName("refresh_token")]
     public string RefreshToken { get; set; } = default!;
 
-    public bool Success { get; set; }
+    public bool Success => !string.IsNullOrWhiteSpace(AccessToken);
 }

@@ -4,10 +4,11 @@
 //  </copyright>
 // -------------------------------------------------------------------------------------
 
-namespace BlazorDemo.Services.Dto;
+namespace BlazorDemo.WebApp.Models.Products;
 
 public class Category
 {
     public Guid Id { get; set; }
+
     public string Name { get; set; } = default!;
 }

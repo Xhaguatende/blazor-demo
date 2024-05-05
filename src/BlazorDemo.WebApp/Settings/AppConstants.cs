@@ -1,13 +1,13 @@
 ﻿// -------------------------------------------------------------------------------------
-//  <copyright file="SignInSimpleResponse.cs" company="{Company Name}">
+//  <copyright file="AppConstants.cs" company="{Company Name}">
 //    Copyright (c) {Company Name}. All rights reserved.
 //  </copyright>
 // -------------------------------------------------------------------------------------
 
-namespace BlazorDemo.Models;
+namespace BlazorDemo.WebApp.Settings;
 
-public class SignInSimpleResponse
+public static class AppConstants
 {
-    public string Message { get; set; } = default!;
-    public bool Success { get; set; }
+    public const string AuthenticationType = "Bearer";
+    public const string UserSession = "UserSession";
 }

@@ -2,10 +2,10 @@
 @page "/editproduct/{id:guid}"
 
 @inject NavigationManager NavigationManager
-@inject ProductsClient ProductsClient
-@inject CategoriesClient CategoriesClient
+@inject IProductServices ProductServices
+@inject ICategoryServices CategoryServices
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <PageTitle>@_title</PageTitle>
 
@@ -59,7 +59,7 @@ else
                 </div>
 
                 <button type="submit" class="btn btn-primary">Save</button>
-                <a class="btn btn-secondary" role="button" href="/">Cancel</a>
+                <a class="btn btn-secondary" role="button" href="/products">Cancel</a>
 
             </EditForm>
         </div>
@@ -72,7 +72,7 @@ else
     public Guid? Id { get; set; }
 
     [SupplyParameterFromForm]
-    private Product? Product { get; set; }
+    private UpsertProduct? Product { get; set; }
 
     private List<Category>? _categories;
 
@@ -87,8 +87,19 @@ else
 
         if (Id.HasValue)
         {
-            Product = await ProductsClient.GetProductAsync(Id.Value);
-            _title = $"Edit Product {Product.Name}";
+            var product = await ProductServices.GetByIdAsync(Id.Value);
+
+            _title = $"Edit Product {product.Name}";
+
+            Product = new()
+            {
+                Id = product.Id,
+                Name = product.Name,
+                CategoryId = product.Category.Id,
+                Description = product.Description,
+                Price = product.Price,
+                Stock = product.Stock
+            };
         }
         else
         {
@@ -96,29 +107,28 @@ else
             {
                 Name = string.Empty,
             };
+
             _title = "New Product";
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
-         _categories = await CategoriesClient.GetCategoriesAsync();
+        _categories = await CategoryServices.GetAllAsync();
     }
 
     private async Task HandleValidAsync()
     {
         ArgumentNullException.ThrowIfNull(Product);
 
-        if(Id is null || Id == Guid.Empty)
-        {
-            await ProductsClient.AddProductAsync(Product);
-        }
-        else
+        if(Id is not null && Id != Guid.Empty)
         {
             Product.Id = Id.Value;
-            await ProductsClient.UpdateProductAsync(Product);
+            await ProductServices.UpsertAsync(Product);
         }
 
-        NavigationManager.NavigateTo("/");
+        await ProductServices.UpsertAsync(Product);
+
+        NavigationManager.NavigateTo("/products");
     }
 }

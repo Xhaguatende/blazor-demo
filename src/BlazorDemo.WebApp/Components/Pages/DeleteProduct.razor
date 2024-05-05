@@ -1,4 +1,4 @@
-﻿@inject ProductsClient ProductsClient
+﻿@inject IProductServices ProductServices
 @inject NavigationManager NavigationManager
 
 @rendermode InteractiveServer
@@ -9,6 +9,9 @@
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="deleteModalLabel">@_title</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the product: <strong>@Product?.Name</strong>?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -25,12 +28,15 @@
 
 @code {
     [Parameter]
+    public EventCallback OnProductDeleted { get; set; }  // Add this line
+
+    [Parameter]
     public Guid? Id { get; set; }
 
     [Parameter]
-    public ProductSummary? Product { get; set; }
+    public Product? Product { get; set; }
 
-    public static string GetModalId(ProductSummary? product)
+    public static string GetModalId(Product? product)
     {
         ArgumentNullException.ThrowIfNull(product);
 
@@ -46,8 +52,8 @@
 
     private async Task ConfirmAsync()
     {
-        await ProductsClient.DeleteProductAsync(Product!.Id);
+        await ProductServices.DeleteAsync(Product!.Id);
+        await OnProductDeleted.InvokeAsync();
 
-        NavigationManager.Refresh();
     }
 }

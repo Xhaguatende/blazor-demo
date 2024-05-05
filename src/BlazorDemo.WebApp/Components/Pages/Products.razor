@@ -1,11 +1,12 @@
 ﻿@page "/products"
-@inject ProductsClient ProductsClient
-@attribute [StreamRendering]
+
+@inject IProductServices ProductServices
+
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <PageTitle>Products</PageTitle>
 
 <div class="mt-2 mb-2">
-    @* ReSharper disable once Html.PathError *@
     <a class="btn btn-primary" role="button" href="/newproduct">New Product</a>
 </div>
 
@@ -46,7 +47,7 @@ else
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
-                        <DeleteProduct Product="@product" />
+                        <DeleteProduct Product="@product" OnProductDeleted="RefreshProducts" />
                     </td>
                 </tr>
             }
@@ -56,18 +57,24 @@ else
 
 @code
 {
-    private List<ProductSummary>? _products = [];
+    private List<Product>? _products = [];
 
     protected override async Task OnInitializedAsync()
     {
-        _products = await ProductsClient.GetProductsAsync();
+        _products = await ProductServices.GetAllAsync();
     }
 
     private static string ProductUrl(Guid id) => $"/editproduct/{id}";
 
-    private string GetDeleteModalId(ProductSummary product)
+    private static string GetDeleteModalId(Product product)
     {
         return $"#{DeleteProduct.GetModalId(product)}";
+    }
+
+    private async Task RefreshProducts()  // Add this method to refresh the product list
+    {
+        _products = await ProductServices.GetAllAsync();
+        StateHasChanged();  // Ensure UI updates
     }
 }
 
