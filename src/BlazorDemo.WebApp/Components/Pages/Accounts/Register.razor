@@ -1,26 +1,31 @@
-﻿@page "/sign-in"
+﻿@page "/register"
 
 @inject NavigationManager NavigationManager
 @inject IAccountServices AccountServices
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
-<PageTitle>Sign-In</PageTitle>
-<h3>Sign-In</h3>
+<PageTitle>Register</PageTitle>
+<h3>Register</h3>
 
 <div class="row justify-content-center">
     <div class="col-md-4">
-        <EditForm Model="@SignInRequest" FormName="signIn" OnValidSubmit="HandleValidAsync">
+        <EditForm Model="@RegisterRequest" FormName="register" OnValidSubmit="HandleValidAsync">
             <DataAnnotationsValidator />
             <div class="form-group mb-3">
                 <label asp-for="Email"></label>
-                <InputText id="email" placeholder="Email" class="form-control" @bind-Value="SignInRequest.Email"/>
-                <ValidationMessage For="() => SignInRequest.Email"/>
+                <InputText id="email" placeholder="Email" class="form-control" @bind-Value="RegisterRequest.Email"/>
+                <ValidationMessage For="() => RegisterRequest.Email"/>
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Password"></label>
-                <InputText id="password" type="password" placeholder="Password" class="form-control" @bind-Value="SignInRequest.Password"/>
-                <ValidationMessage For="() => SignInRequest.Password"/>
+                <InputText id="password" type="password" placeholder="Password" class="form-control" @bind-Value="RegisterRequest.Password"/>
+                <ValidationMessage For="() => RegisterRequest.Password"/>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Confirm Password"></label>
+                <InputText id="confirmPassword" type="password" placeholder="Confirm Password" class="form-control" @bind-Value="RegisterRequest.ConfirmPassword" />
+                <ValidationMessage For="() => RegisterRequest.ConfirmPassword" />
             </div>
             <button type="submit" class="btn btn-primary w-100">Sign in</button>
         </EditForm>
@@ -29,16 +34,16 @@
 
 @code {
     [SupplyParameterFromForm]
-    private SignInRequest SignInRequest { get; set; } = new();
+    private RegisterRequest RegisterRequest { get; set; } = new();
 
     private async Task HandleValidAsync()
     {
-        var result = await AccountServices.SignInAsync(SignInRequest);
+        var result = await AccountServices.RegisterAsync(RegisterRequest);
 
         if (result.Success)
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/sign-in");
         }
     }
 
-}
+} 
