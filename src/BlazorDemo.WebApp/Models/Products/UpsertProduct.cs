@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 public class UpsertProduct
 {
     [Required(ErrorMessage = "The category is required.")]
-    public Guid CategoryId { get; set; } = default!;
+    public Guid CategoryId { get; set; } = Guid.Empty;
 
     [Required]
     [StringLength(500)]
